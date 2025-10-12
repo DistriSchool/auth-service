@@ -1,0 +1,17 @@
+# Build artifacts
+/target
+
+# VCS
+.git
+.gitignore
+.idea
+.mvn/wrapper/maven-wrapper.jar
+
+# OS/editor
+.DS_Store
+*.log
+
+# Docker
+Dockerfile*
+**/.dockerignore
+
