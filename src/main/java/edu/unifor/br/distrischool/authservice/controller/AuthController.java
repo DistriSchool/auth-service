@@ -67,7 +67,10 @@ public class AuthController {
     }
 
     @GetMapping("/health")
-    public ResponseEntity<String> health() {
-        return ResponseEntity.ok("Auth Service is running!");
+    public ResponseEntity<StatusResponse> health() {
+        StatusResponse response = StatusResponse.builder()
+            .status(SystemStatus.OK)
+            .build();
+        return ResponseEntity.ok(response);
     }
 }
