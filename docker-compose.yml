@@ -1,83 +1,17 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: school-postgres
-    environment:
-      POSTGRES_DB: school_auth
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - school-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: school-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    networks:
-      - school-network
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: school-kafka
-    depends_on:
-      - zookeeper
-    ports:
-      # Expose only the external listener to the host
-      - "9093:9093"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      # Dual listeners: internal (containers) and external (host)
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092,LISTENER_DOCKER_EXTERNAL://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092,LISTENER_DOCKER_EXTERNAL://localhost:9093
-      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    networks:
-      - school-network
-    healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:9092"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
   auth-service:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: auth-service
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
     env_file:
       - .env
     environment:
-      # Spring overrides for container networking
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/school_auth
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/distri_school
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      # Server port override via env (optional, defaults to 8081)
       SERVER_PORT: ${SERVER_PORT:-8081}
-      # JWT and Mail from .env (optional fallbacks already in application.yml)
       JWT_SECRET: ${JWT_SECRET}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
@@ -86,9 +20,6 @@ services:
     networks:
       - school-network
 
-volumes:
-  postgres_data:
-
 networks:
   school-network:
-    driver: bridge
+    external: true

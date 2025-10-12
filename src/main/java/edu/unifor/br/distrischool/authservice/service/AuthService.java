@@ -58,6 +58,7 @@ public class AuthService {
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
+                .type("Bearer")
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole())
