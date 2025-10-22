@@ -1,6 +1,7 @@
 package edu.unifor.br.distrischool.authservice.controller;
 
 import edu.unifor.br.distrischool.authservice.dto.*;
+import edu.unifor.br.distrischool.authservice.dto.UserProfileResponse;
 import edu.unifor.br.distrischool.authservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +73,12 @@ public class AuthController {
             .status(SystemStatus.OK)
             .build();
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> me() {
+        log.info("GET /api/auth/me");
+        UserProfileResponse profile = authService.getCurrentUserProfile();
+        return ResponseEntity.ok(profile);
     }
 }
