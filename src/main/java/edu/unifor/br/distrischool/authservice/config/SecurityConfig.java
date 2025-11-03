@@ -40,12 +40,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/verify-email",
-                                "/api/auth/request-password-reset",
-                                "/api/auth/reset-password",
-                                "/api/auth/refresh-token",
+                                "/auth/login",
+                                "/auth/register",
+                                "/auth/verify-email",
+                                "/auth/request-password-reset",
+                                "/auth/reset-password",
+                                "/auth/refresh-token",
                                 "/actuator/**",
                                 "/error"
                         ).permitAll()
@@ -83,8 +83,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost:3000"
+                "*"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
