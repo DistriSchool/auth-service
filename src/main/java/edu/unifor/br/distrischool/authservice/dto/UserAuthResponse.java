@@ -10,13 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponse {
+public class UserAuthResponse {
     private String token;
     private String refreshToken;
     private String type = "Bearer";
     private Long userId;
     private String email;
     private String name;
+    private boolean emailVerified;
     private User.Role role;
     private long expiresIn;
 }

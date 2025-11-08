@@ -30,7 +30,7 @@ public class AuthService {
     private final EmailService emailService;
 
     @Transactional
-    public LoginResponse login(LoginRequest request) {
+    public UserAuthResponse login(LoginRequest request) {
         log.info("Tentativa de login para o email: {}", request.getEmail());
 
         authenticationManager.authenticate(
@@ -57,12 +57,13 @@ public class AuthService {
 
         log.info("Login bem-sucedido para: {}", user.getEmail());
 
-        return LoginResponse.builder()
+        return UserAuthResponse.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
                 .type("Bearer")
                 .email(user.getEmail())
+                .emailVerified(user.isEmailVerified())
                 .name(user.getName())
                 .role(user.getRole())
                 .expiresIn(jwtService.getExpirationTime())
@@ -70,7 +71,7 @@ public class AuthService {
     }
 
     @Transactional
-    public MessageResponse register(RegisterRequest request) {
+    public UserAuthResponse register(RegisterRequest request) {
         log.info("Tentativa de registro para o email: {}", request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -91,15 +92,25 @@ public class AuthService {
 
         userRepository.save(user);
 
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
         emailService.sendVerificationEmail(user.getEmail(), verificationToken);
 
         kafkaEventService.publishUserEvent("user.registered", user);
 
         log.info("Usuário registrado com sucesso: {}", user.getEmail());
 
-        return MessageResponse.builder()
-                .success(true)
-                .message("Usuário registrado com sucesso! Verifique seu email para ativar a conta.")
+        return UserAuthResponse.builder()
+                .token(jwtToken)
+                .refreshToken(refreshToken)
+                .userId(user.getId())
+                .type("Bearer")
+                .email(user.getEmail())
+                .emailVerified(user.isEmailVerified())
+                .name(user.getName())
+                .role(user.getRole())
+                .expiresIn(jwtService.getExpirationTime())
                 .build();
     }
 
@@ -170,7 +181,7 @@ public class AuthService {
                 .build();
     }
 
-    public LoginResponse refreshToken(RefreshTokenRequest request) {
+    public UserAuthResponse refreshToken(RefreshTokenRequest request) {
         log.info("Renovando token");
 
         String userEmail = jwtService.extractUsername(request.getRefreshToken());
@@ -183,7 +194,7 @@ public class AuthService {
 
         String newAccessToken = jwtService.generateToken(user);
 
-        return LoginResponse.builder()
+        return UserAuthResponse.builder()
                 .token(newAccessToken)
                 .refreshToken(request.getRefreshToken())
                 .userId(user.getId())
