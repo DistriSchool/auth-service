@@ -29,16 +29,16 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
                 .error("Erro de validação")
                 .message("Dados inválidos")
                 .validationErrors(errors)
                 .build();
-
-        return ResponseEntity.badRequest().body(errorResponse);
+        
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

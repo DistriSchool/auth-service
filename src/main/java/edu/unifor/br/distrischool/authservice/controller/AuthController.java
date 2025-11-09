@@ -37,6 +37,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/resend-email-verification")
+    public ResponseEntity<MessageResponse> resendEmailVerification() {
+        MessageResponse response = authService.resendEmailVerification();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/request-password-reset")
     public ResponseEntity<MessageResponse> requestPasswordReset(
             @Valid @RequestBody PasswordResetRequest request

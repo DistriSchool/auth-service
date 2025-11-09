@@ -135,6 +135,44 @@ public class AuthService {
                 .build();
     }
 
+        @Transactional
+        public MessageResponse resendEmailVerification() {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || authentication.getPrincipal() == null) {
+                throw new RuntimeException("Usuário não autenticado");
+            }
+
+            String email;
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                email = ((UserDetails) principal).getUsername();
+            } else if (principal instanceof String) {
+                email = (String) principal;
+            } else {
+                throw new RuntimeException("Não foi possível determinar o usuário autenticado");
+            }
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+            if (user.isEmailVerified()) {
+                throw new RuntimeException("Email já verificado");
+            }
+
+            String verificationToken = UUID.randomUUID().toString();
+            user.setVerificationToken(verificationToken);
+            userRepository.save(user);
+
+            emailService.sendVerificationEmail(user.getEmail(), verificationToken);
+
+            log.info("Email de verificação reenviado para: {}", user.getEmail());
+
+            return MessageResponse.builder()
+                    .success(true)
+                    .message("Email de verificação reenviado com sucesso!")
+                    .build();
+        }
+
     @Transactional
     public MessageResponse requestPasswordReset(PasswordResetRequest request) {
         log.info("Solicitação de reset de senha para: {}", request.getEmail());
