@@ -72,6 +72,26 @@ public class EmailService {
         }
     }
 
+    public void sendTemporaryPasswordEmail(String toEmail, String tempPassword) {
+        if (!mailEnabled) {
+            log.warn("Email desabilitado. Temporary password for {} is: {}", toEmail, tempPassword);
+            return;
+        }
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject("Sua conta foi criada");
+            message.setText(buildTemporaryPasswordBody(tempPassword));
+
+            mailSender.send(message);
+            log.info("Temporary password email sent to: {} via {}", toEmail, mailHost);
+        } catch (Exception e) {
+            log.error("Erro ao enviar email com senha temporária para {}: {}", toEmail, e.getMessage(), e);
+        }
+    }
+
     private String buildVerificationEmailBody(String verificationLink) {
         return "Olá,\n\n" +
                 "Obrigado por se registrar em nosso sistema escolar!\n\n" +
@@ -94,9 +114,12 @@ public class EmailService {
                 "Equipe Sistema Escolar";
     }
 
-    private boolean isLocalEnvironment() {
-        return "mailhog".equalsIgnoreCase(mailHost) || 
-               mailHost.contains("localhost") || 
-               mailHost.contains("127.0.0.1");
+    private String buildTemporaryPasswordBody(String tempPassword) {
+        return "Olá,\n\n" +
+                "Sua conta de estudante foi criada. A senha temporária é:\n\n" +
+                tempPassword + "\n\n" +
+                "Acesse o sistema e altere sua senha assim que fizer o login.\n\n" +
+                "Atenciosamente,\n" +
+                "Equipe Sistema Escolar";
     }
 }

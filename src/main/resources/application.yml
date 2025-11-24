@@ -18,6 +18,8 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+    table: auth_schema_history
+
   kafka:
     bootstrap-servers: kafka:9092
     producer:
@@ -25,6 +27,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: false
+
   mail:
     enabled: ${MAIL_ENABLED:true}
     host: ${MAIL_HOST:mailhog}

@@ -16,5 +16,6 @@ public class UserEvent {
     private String email;
     private String name;
     private User.Role role;
+    private String password; // temporary plaintext password sent by producer
     private String timestamp;
 }
