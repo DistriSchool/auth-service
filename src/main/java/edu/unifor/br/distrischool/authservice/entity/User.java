@@ -90,8 +90,7 @@ public class User implements UserDetails {
     public enum Role {
         ADMIN,
         TEACHER,
-        STUDENT,
-        PARENT
+        STUDENT
     }
 }
 

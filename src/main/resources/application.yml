@@ -62,3 +62,7 @@ logging:
 app:
   frontend:
     url: ${FRONTEND_URL:http://localhost:3000}
+  admin:
+    name: ${ADMIN_NAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}

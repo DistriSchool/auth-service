@@ -25,12 +25,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserAuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        UserAuthResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping("/verify-email")
     public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
         MessageResponse response = authService.verifyEmail(token);
