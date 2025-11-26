@@ -1,6 +1,8 @@
 spring:
   application:
     name: auth-service
+  mvc:
+    static-path-pattern: /static/**
   datasource:
     url: jdbc:postgresql://postgres:5432/distri_school
     username: postgres
@@ -15,21 +17,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health,info,prometheus,metrics
-    endpoint:
-      prometheus:
-        enabled: true
-
-  micrometer:
-    metrics:
-      export:
-        prometheus:
-          enabled: true
-          step: 15s
+  # management and micrometer moved to top-level to enable Actuator endpoints
 
   flyway:
     enabled: true
@@ -83,3 +71,18 @@ app:
     name: ${ADMIN_NAME}
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    prometheus:
+      enabled: true
+
+metrics:
+  export:
+    prometheus:
+      enabled: true
+      step: 15s
