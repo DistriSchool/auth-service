@@ -1,5 +1,4 @@
--- V1__create_users_table.sql
--- Localização: src/main/resources/db/migration/
+-- V2__create_users_table.sql
 
 CREATE TABLE IF NOT EXISTS users (
                                      id BIGSERIAL PRIMARY KEY,

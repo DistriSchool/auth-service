@@ -14,6 +14,23 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,prometheus,metrics
+    endpoint:
+      prometheus:
+        enabled: true
+
+  micrometer:
+    metrics:
+      export:
+        prometheus:
+          enabled: true
+          step: 15s
+
   flyway:
     enabled: true
     baseline-on-migrate: true
